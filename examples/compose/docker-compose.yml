@@ -1,0 +1,16 @@
+version: "3.7"
+
+services:
+  unbound:
+    image: crazymax/unbound
+    container_name: unbound
+    ports:
+      - target: 5053
+        published: 5053
+        protocol: tcp
+      - target: 5053
+        published: 5053
+        protocol: udp
+    volumes:
+      - "./config:/config:ro"
+    restart: always
