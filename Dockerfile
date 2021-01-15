@@ -47,6 +47,7 @@ RUN apk --update --no-cache add \
     || cat config.log \
   && make -j$(nproc) \
   && make install \
+  && strip $(which unbound) \
   && unbound -V \
   && unbound-anchor -v || true \
   # ldns
@@ -68,6 +69,7 @@ RUN apk --update --no-cache add \
     || cat config.log \
   && make -j$(nproc) \
   && make install \
+  && strip $(which drill) \
   && ldns-config --version \
   && apk del build-dependencies \
   && rm -rf /tmp/* /var/cache/apk/* /var/www/*
