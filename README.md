@@ -47,7 +47,12 @@ ___
 ```shell
 git clone https://github.com/crazy-max/docker-unbound.git
 cd docker-unbound
+
+# Build image and output to docker (default)
 docker buildx bake
+
+# Build multi-platform image
+docker buildx bake image-all
 ```
 
 ### Image
