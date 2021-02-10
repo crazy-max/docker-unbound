@@ -38,7 +38,7 @@ jobs:
           buildkitd-flags: --debug
       -
         name: Build
-        uses: crazy-max/ghaction-docker-buildx-bake@v1
+        uses: docker/bake-action@v1
         with:
           targets: image-local
         env:

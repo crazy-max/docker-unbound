@@ -65,8 +65,8 @@ jobs:
           username: ${{ secrets.GHCR_USERNAME }}
           password: ${{ secrets.GHCR_TOKEN }}
       -
-        name: Build image
-        uses: crazy-max/ghaction-docker-buildx-bake@v1
+        name: Build
+        uses: docker/bake-action@v1
         with:
           files: |
             ./docker-bake.hcl
