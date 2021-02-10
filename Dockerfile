@@ -1,7 +1,7 @@
 FROM --platform=${TARGETPLATFORM:-linux/amd64} alpine:3.12
 LABEL maintainer="CrazyMax"
 
-ENV UNBOUND_VERSION="1.13.0" \
+ENV UNBOUND_VERSION="1.13.1" \
   LDNS_VERSION="1.7.1"
 
 RUN apk --update --no-cache add \

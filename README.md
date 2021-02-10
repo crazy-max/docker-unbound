@@ -19,10 +19,9 @@ If you are interested, [check out](https://hub.docker.com/r/crazymax/) my other 
 ___
 
 * [Features](#features)
-* [Docker](#docker)
-  * [Build locally](#build-locally)
-  * [Image](#image)
-  * [Ports](#ports)
+* [Build locally](#build-locally)
+* [Image](#image)
+* [Ports](#ports)
 * [Usage](#usage)
   * [Docker Compose](#docker-compose)
   * [Command line](#command-line)
@@ -40,9 +39,7 @@ ___
 * Bind to [unprivileged port](#ports)
 * Multi-platform image
 
-## Docker
-
-### Build locally
+## Build locally
 
 ```shell
 git clone https://github.com/crazy-max/docker-unbound.git
@@ -55,7 +52,7 @@ docker buildx bake
 docker buildx bake image-all
 ```
 
-### Image
+## Image
 
 | Registry                                                                                         | Image                           |
 |--------------------------------------------------------------------------------------------------|---------------------------------|
@@ -82,7 +79,7 @@ Image: crazymax/unbound:latest
 
 * `/config`: Additional [configuration](#configuration) files
 
-### Ports
+## Ports
 
 * `5053/tcp 5053/udp`: DNS listening port
 
