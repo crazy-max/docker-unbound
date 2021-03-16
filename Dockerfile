@@ -1,9 +1,11 @@
-FROM --platform=${TARGETPLATFORM:-linux/amd64} alpine:3.12
+ARG UNBOUND_VERSION=1.13.1
+ARG LDNS_VERSION=1.7.1
+
+FROM alpine:3.12
 LABEL maintainer="CrazyMax"
 
-ENV UNBOUND_VERSION="1.13.1" \
-  LDNS_VERSION="1.7.1"
-
+ARG UNBOUND_VERSION
+ARG LDNS_VERSION
 RUN apk --update --no-cache add \
     ca-certificates \
     dns-root-hints \
