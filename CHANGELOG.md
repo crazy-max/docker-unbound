@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.14.0-r0 (2021/12/12)
+
+* Unbound 1.14.0
+* ldns 1.8.1
+* Alpine Linux 3.15
+
 ## 1.13.2-r0 (2021/08/15)
 
 * Unbound 1.13.2
