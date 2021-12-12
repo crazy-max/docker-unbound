@@ -1,7 +1,7 @@
 ARG UNBOUND_VERSION=1.13.2
 ARG LDNS_VERSION=1.7.1
 
-FROM alpine:3.14
+FROM alpine:3.15
 
 ARG UNBOUND_VERSION
 ARG LDNS_VERSION
@@ -73,7 +73,7 @@ RUN apk --update --no-cache add \
   && strip $(which drill) \
   && ldns-config --version \
   && apk del build-dependencies \
-  && rm -rf /tmp/* /var/cache/apk/* /var/www/*
+  && rm -rf /tmp/* /var/www/*
 
 COPY rootfs /
 
@@ -81,7 +81,7 @@ RUN mkdir -p /config \
   && addgroup -g 1500 unbound \
   && adduser -D -H -u 1500 -G unbound -s /bin/sh unbound \
   && chown -R unbound. /etc/unbound /run/unbound \
-  && rm -rf /tmp/* /var/cache/apk/*
+  && rm -rf /tmp/*
 
 USER unbound
 
