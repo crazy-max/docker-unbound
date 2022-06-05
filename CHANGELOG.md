@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.16.0-r0 (2022/06/05)
+
+* Unbound 1.16.0
+* Alpine Linux 3.16
+* Native cross compilation (#19)
+
 ## 1.14.0-r0 (2021/12/12)
 
 * Unbound 1.14.0
