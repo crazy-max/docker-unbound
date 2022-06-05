@@ -3,10 +3,11 @@
 ARG UNBOUND_VERSION=1.16.0
 ARG LDNS_VERSION=1.8.1
 ARG XX_VERSION=1.1.1
+ARG ALPINE_VERSION=3.16
 
 FROM --platform=$BUILDPLATFORM tonistiigi/xx:${XX_VERSION} AS xx
 
-FROM --platform=$BUILDPLATFORM alpine:3.16 AS base
+FROM --platform=$BUILDPLATFORM alpine:${ALPINE_VERSION} AS base
 COPY --from=xx / /
 RUN apk --update --no-cache add binutils clang curl file make pkgconf tar tree xz
 
@@ -89,7 +90,7 @@ xx-verify /out/usr/bin/drill
 file /out/usr/bin/drill
 EOT
 
-FROM alpine:3.15
+FROM alpine:${ALPINE_VERSION}
 COPY --from=unbound-build /out /
 COPY --from=ldns-build /out /
 
