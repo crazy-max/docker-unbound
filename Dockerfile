@@ -1,10 +1,98 @@
+# syntax=docker/dockerfile:1
+
 ARG UNBOUND_VERSION=1.15.0
 ARG LDNS_VERSION=1.8.1
+ARG XX_VERSION=1.1.1
+
+FROM --platform=$BUILDPLATFORM tonistiigi/xx:${XX_VERSION} AS xx
+
+FROM --platform=$BUILDPLATFORM alpine:3.15 AS base
+COPY --from=xx / /
+RUN apk --update --no-cache add binutils clang curl file make pkgconf tar tree xz
+
+FROM base AS base-build
+ENV XX_CC_PREFER_LINKER=ld
+ARG TARGETPLATFORM
+RUN xx-apk --no-cache add gcc g++ expat-dev libevent-dev libcap libpcap-dev openssl-dev perl
+RUN xx-clang --setup-target-triple
+
+FROM base AS unbound-src
+WORKDIR /src/unbound
+ARG UNBOUND_VERSION
+RUN curl -sSL "https://unbound.net/downloads/unbound-${UNBOUND_VERSION}.tar.gz" | tar xz --strip 1
+
+FROM base AS ldns-src
+WORKDIR /src/ldns
+ARG LDNS_VERSION
+RUN curl -sSL "https://nlnetlabs.nl/downloads/ldns/ldns-${LDNS_VERSION}.tar.gz" | tar xz --strip 1
+
+FROM base-build AS unbound-build
+COPY --from=unbound-src /src/unbound /src/unbound
+WORKDIR /src/unbound
+RUN set -x ; CC=xx-clang CXX=xx-clang++ ./configure \
+  --host=$(xx-clang --print-target-triple) \
+  --prefix=/usr \
+  --sysconfdir=/etc \
+  --mandir=/usr/share/man \
+  --localstatedir=/var \
+  --with-chroot-dir="" \
+  --with-pidfile=/var/run/unbound/unbound.pid \
+  --with-run-dir=/var/run/unbound \
+  --with-username="" \
+  --disable-flto \
+  --disable-rpath \
+  --disable-shared \
+  --enable-event-api \
+  --with-pthreads \
+  --with-libexpat=$(xx-info sysroot)/usr \
+  --with-libevent=$(xx-info sysroot)/usr \
+  --with-ssl=$(xx-info sysroot)/usr
+RUN <<EOT
+set -ex
+make DESTDIR=/out install
+make DESTDIR=/out unbound-event-install
+install -Dm755 contrib/update-anchor.sh /out/usr/share/unbound/update-anchor.sh
+tree /out
+xx-verify /out/usr/sbin/unbound
+xx-verify /out/usr/sbin/unbound-anchor
+xx-verify /out/usr/sbin/unbound-checkconf
+xx-verify /out/usr/sbin/unbound-control
+xx-verify /out/usr/sbin/unbound-host
+file /out/usr/sbin/unbound
+file /out/usr/sbin/unbound-anchor
+file /out/usr/sbin/unbound-checkconf
+file /out/usr/sbin/unbound-control
+file /out/usr/sbin/unbound-host
+EOT
+
+FROM base-build AS ldns-build
+COPY --from=ldns-src /src/ldns /src/ldns
+WORKDIR /src/ldns
+RUN set -x ; CC=xx-clang CXX=xx-clang++ CPPFLAGS=-I/src/ldns/ldns ./configure \
+  --host=$(xx-clang --print-target-triple) \
+  --prefix=/usr \
+  --sysconfdir=/etc \
+  --mandir=/usr/share/man \
+  --infodir=/usr/share/info \
+  --localstatedir=/var \
+  --disable-gost \
+  --disable-rpath \
+  --disable-shared \
+  --with-drill \
+  --with-ssl=$(xx-info sysroot)/usr \
+  --with-trust-anchor=/var/run/unbound/root.key
+RUN <<EOT
+set -ex
+make DESTDIR=/out install
+tree /out
+xx-verify /out/usr/bin/drill
+file /out/usr/bin/drill
+EOT
 
 FROM alpine:3.15
+COPY --from=unbound-build /out /
+COPY --from=ldns-build /out /
 
-ARG UNBOUND_VERSION
-ARG LDNS_VERSION
 RUN apk --update --no-cache add \
     ca-certificates \
     dns-root-hints \
@@ -14,65 +102,10 @@ RUN apk --update --no-cache add \
     libpcap \
     openssl \
     shadow \
-  && apk --update --no-cache add -t build-dependencies \
-    build-base \
-    curl \
-    expat-dev \
-    libevent-dev \
-    linux-headers \
-    libcap \
-    libpcap-dev \
-    openssl-dev \
-    perl \
-    tar \
-  # unbound
-  && mkdir /tmp/unbound && cd /tmp/unbound \
   && mkdir -p /run/unbound \
-  && curl -sSL "https://unbound.net/downloads/unbound-${UNBOUND_VERSION}.tar.gz" | tar xz --strip 1 \
-  && ./configure \
-    --prefix=/usr \
-    --sysconfdir=/etc \
-    --mandir=/usr/share/man \
-    --localstatedir=/var \
-    --with-chroot-dir="" \
-    --with-pidfile=/var/run/unbound/unbound.pid \
-    --with-run-dir=/var/run/unbound \
-    --with-username="" \
-    --disable-flto \
-    --disable-rpath \
-    --disable-shared \
-    --enable-event-api \
-    --with-libevent \
-    --with-pthreads \
-    --with-ssl \
-    || cat config.log \
-  && make -j$(nproc) \
-  && make install \
-  && strip $(which unbound) \
   && unbound -V \
   && unbound-anchor -v || true \
-  # ldns
-  && mkdir /tmp/ldns && cd /tmp/ldns \
-  && curl -sSL "https://nlnetlabs.nl/downloads/ldns/ldns-${LDNS_VERSION}.tar.gz" | tar xz --strip 1 \
-  && ./configure \
-    --prefix=/usr \
-    --sysconfdir=/etc \
-    --mandir=/usr/share/man \
-    --infodir=/usr/share/info \
-    --localstatedir=/var \
-    --disable-gost \
-    --disable-rpath \
-    --disable-shared \
-    --with-drill \
-    --with-ssl \
-    --with-trust-anchor=/var/run/unbound/root.key \
-    --with-ssl \
-    || cat config.log \
-  && make -j$(nproc) \
-  && make install \
-  && strip $(which drill) \
   && ldns-config --version \
-  && apk del build-dependencies \
   && rm -rf /tmp/* /var/www/*
 
 COPY rootfs /
