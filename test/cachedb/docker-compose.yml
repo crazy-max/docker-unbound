@@ -1,7 +1,17 @@
 services:
+  redis:
+    image: redis:6-alpine
+    container_name: unbound-redis
+    command: redis-server --save 60 1
+    volumes:
+      - "./redis:/data"
+    restart: always
+
   unbound:
-    image: crazymax/unbound
+    image: ${BUILD_TAG:-crazymax/unbound}
     container_name: unbound
+    depends_on:
+      - redis
     ports:
       - target: 5053
         published: 5053

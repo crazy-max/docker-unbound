@@ -12,21 +12,25 @@ on:
     paths-ignore:
       - '**.md'
 
+env:
+  BUILD_TAG: unbound:test
+  CONTAINER_NAME: unbound
+  RUNNING_TIMEOUT: 120
+  RUNNING_LOG_CHECK: "info: start of service"
+
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        test:
+          - cachedb
+          - standard
     steps:
       -
         name: Checkout
         uses: actions/checkout@v3
-      -
-        name: Prepare
-        id: prep
-        run: |
-          echo ::set-output name=build_tag::test
-          echo ::set-output name=container_name::unbound
-          echo ::set-output name=running_timeout::120
-          echo ::set-output name=running_log_check::info: start of service
       -
         name: Set up QEMU
         uses: docker/setup-qemu-action@v2
@@ -39,36 +43,36 @@ jobs:
         with:
           targets: image-local
         env:
-          DEFAULT_TAG: ${{ steps.prep.outputs.build_tag }}
+          DEFAULT_TAG: ${{ env.BUILD_TAG }}
       -
-        name: Start container
+        name: Start services
+        working-directory: ./test/${{ matrix.test }}
         run: |
-          docker rm -f ${{ steps.prep.outputs.container_name }} > /dev/null 2>&1 || true
-          docker run -d --name ${{ steps.prep.outputs.container_name }} ${{ steps.prep.outputs.build_tag }}
+          docker compose up -d
       -
         name: Test run
         run: |
-          TIMEOUT=$((SECONDS + ${{ steps.prep.outputs.running_timeout }}))
+          TIMEOUT=$((SECONDS + ${{ env.RUNNING_TIMEOUT }}))
           while read LOGLINE; do
             echo ${LOGLINE}
-            if [[ ${LOGLINE} == *"${{ steps.prep.outputs.running_log_check }}"* ]]; then
+            if [[ ${LOGLINE} == *"${{ env.RUNNING_LOG_CHECK }}"* ]]; then
               echo "🎉 Container up!"
               break
             fi
             if [[ $SECONDS -gt ${TIMEOUT} ]]; then
-              >&2 echo "❌ Failed to run ${{ steps.prep.outputs.container_name }} container"
+              >&2 echo "❌ Failed to run ${{ env.CONTAINER_NAME }} container"
               exit 1
             fi
-          done < <(docker logs -f ${{ steps.prep.outputs.container_name }} 2>&1)
+          done < <(docker logs -f ${{ env.CONTAINER_NAME }} 2>&1)
 
-          CONTAINER_STATUS=$(docker container inspect --format "{{.State.Status}}" ${{ steps.prep.outputs.container_name }})
+          CONTAINER_STATUS=$(docker container inspect --format "{{.State.Status}}" ${{ env.CONTAINER_NAME }})
           if [[ ${CONTAINER_STATUS} != "running" ]]; then
-            >&2 echo "❌ Container ${{ steps.prep.outputs.container_name }} returned status '$CONTAINER_STATUS'"
+            >&2 echo "❌ Container ${{ env.CONTAINER_NAME }} returned status '$CONTAINER_STATUS'"
             exit 1
           fi
       -
-        name: Container logs
+        name: Logs
         if: always()
         run: |
-          docker logs ${{ steps.prep.outputs.container_name }}
-          docker rm -f ${{ steps.prep.outputs.container_name }} > /dev/null 2>&1 || true
+          docker logs ${{ env.CONTAINER_NAME }}
+          docker rm -f ${{ env.CONTAINER_NAME }} > /dev/null 2>&1 || true
