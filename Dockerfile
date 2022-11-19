@@ -128,8 +128,13 @@ EXPOSE 5053/tcp
 EXPOSE 5053/udp
 VOLUME [ "/config" ]
 
-ENTRYPOINT [ "unbound" ]
-CMD [ "-d", "-c", "/etc/unbound/unbound.conf" ]
+COPY <<-"EOF" /entrypoint.sh
+	#!/bin/sh
+	set -e
+	unbound-checkconf /etc/unbound/unbound.conf
+	exec unbound -d -c /etc/unbound/unbound.conf
+EOF
+CMD sh /entrypoint.sh
 
 HEALTHCHECK --interval=30s --timeout=10s \
   CMD drill -p 5053 unbound.net @127.0.0.1
