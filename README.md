@@ -11,8 +11,9 @@
 
 ## About
 
-Docker image for [Unbound](https://unbound.net/), a validating, recursive, and caching DNS resolver.<br />
-If you are interested, [check out](https://hub.docker.com/r/crazymax/) my other Docker images!
+Docker image for [Unbound](https://unbound.net/), a validating, recursive, and
+caching DNS resolver. If you are interested, [check out](https://hub.docker.com/r/crazymax/)
+my other Docker images!
 
 💡 Want to be notified of new releases? Check out 🔔 [Diun (Docker Image Update Notifier)](https://github.com/crazy-max/diun) project!
 
@@ -29,6 +30,7 @@ ___
 * [Notes](#notes)
   * [Configuration](#configuration)
   * [Root trust store](#root-trust-store)
+  * [External backend DB as auxiliary cache](#external-backend-db-as-auxiliary-cache)
 * [Contributing](#contributing)
 * [License](#license)
 
@@ -54,10 +56,10 @@ docker buildx bake image-all
 
 ## Image
 
-| Registry                                                                                         | Image                           |
-|--------------------------------------------------------------------------------------------------|---------------------------------|
-| [Docker Hub](https://hub.docker.com/r/crazymax/unbound/)                                            | `crazymax/unbound`           |
-| [GitHub Container Registry](https://github.com/users/crazy-max/packages/container/package/unbound)  | `ghcr.io/crazy-max/unbound`  |
+| Registry                                                                                           | Image                       |
+|----------------------------------------------------------------------------------------------------|-----------------------------|
+| [Docker Hub](https://hub.docker.com/r/crazymax/unbound/)                                           | `crazymax/unbound`          |
+| [GitHub Container Registry](https://github.com/users/crazy-max/packages/container/package/unbound) | `ghcr.io/crazy-max/unbound` |
 
 Following platforms for this image are available:
 
@@ -86,12 +88,13 @@ Image: crazymax/unbound:latest
 
 ### Docker Compose
 
-Docker compose is the recommended way to run this image. You can use the following
-[docker compose template](examples/compose/docker-compose.yml), then run the container:
+Docker compose is the recommended way to run this image. You can use the
+following [docker compose template](examples/compose/docker-compose.yml), then
+run the container:
 
 ```shell
-docker-compose up -d
-docker-compose logs -f
+docker compose up -d
+docker compose logs -f
 ```
 
 ### Command line
@@ -107,8 +110,8 @@ docker run -d -p 5053:5053 --name unbound crazymax/unbound
 Recreate the container whenever I push an update:
 
 ```shell
-docker-compose pull
-docker-compose up -d
+docker compose pull
+docker compose up -d
 ```
 
 ## Notes
@@ -118,12 +121,12 @@ docker-compose up -d
 When Unbound is started the main configuration [/etc/unbound/unbound.conf](rootfs/etc/unbound/unbound.conf)
 is imported.
 
-If you want to override settings from the main configuration you have to create config files
-(with `.conf` extension) in `/config` volume.
+If you want to override settings from the main configuration you have to create
+config files (with `.conf` extension) in `/config` folder.
 
-You can also setup [forwarding queries](https://nlnetlabs.nl/documentation/unbound/unbound.conf/#forward-host)
-to the appropriate public DNS server for queries that cannot be answered by this server using a new ocnfiguration
-called `/config/forward-records.conf`:
+For example, you can set up [forwarding queries](https://nlnetlabs.nl/documentation/unbound/unbound.conf/#forward-host)
+to the appropriate public DNS server for queries that cannot be answered by
+this server using a new configuration named `/config/forward-records.conf`:
 
 ```text
 forward-zone:
@@ -140,7 +143,9 @@ forward-zone:
 A complete documentation about Ubound configuration can be found on
 NLnet Labs website: https://nlnetlabs.nl/documentation/unbound/unbound.conf/
 
-> ⚠️ Container has to be restarted to propagate changes
+> **Warning**
+> 
+> Container has to be restarted to propagate changes
 
 ### Root trust store
 
@@ -161,14 +166,14 @@ called for example `/config/00-trust-anchor.conf`:
   auto-trust-anchor-file: "/root.key"
 ```
 
-> See [documentation](https://nlnetlabs.nl/documentation/unbound/unbound.conf/#auto-trust-anchor-file) for more info
-> about `auto-trust-anchor-file` setting.
+> **Note**
+> 
+> See [documentation](https://nlnetlabs.nl/documentation/unbound/unbound.conf/#auto-trust-anchor-file)
+> for more info about `auto-trust-anchor-file` setting.
 
 And bind mount the key:
 
 ```yaml
-version: "3.7"
-
 services:
   unbound:
     image: crazymax/unbound
@@ -186,11 +191,58 @@ services:
     restart: always
 ```
 
+### External backend DB as auxiliary cache
+
+The cache DB module is already configured in the [module-config](rootfs/etc/unbound/unbound.conf)
+directive and compiled into the daemon.
+
+You just need to create a new Redis service with [persistent storage](https://github.com/docker-library/docs/tree/master/redis#start-with-persistent-storage)
+enabled in your compose file along the Unbound one.
+
+```yaml
+services:
+  redis:
+    image: redis:6-alpine
+    container_name: unbound-redis
+    command: redis-server --save 60 1
+    volumes:
+      - "./redis:/data"
+    restart: always
+
+  unbound:
+    image: crazymax/unbound
+    container_name: unbound
+    depends_on:
+      - redis
+    ports:
+      - target: 5053
+        published: 5053
+        protocol: tcp
+      - target: 5053
+        published: 5053
+        protocol: udp
+    volumes:
+      - "./config:/config:ro"
+    restart: always
+```
+
+And declare the backend configuration to use this Redis instance in `/config`
+like `/config/cachedb.conf`:
+
+```text
+cachedb:
+  backend: "redis"
+  secret-seed: "default"
+  redis-server-host: redis
+  redis-server-port: 6379
+```
+
 ## Contributing
 
-Want to contribute? Awesome! The most basic way to show your support is to star the project, or to raise issues. You
-can also support this project by [**becoming a sponsor on GitHub**](https://github.com/sponsors/crazy-max) or by making
-a [Paypal donation](https://www.paypal.me/crazyws) to ensure this journey continues indefinitely!
+Want to contribute? Awesome! The most basic way to show your support is to star
+the project, or to raise issues. You can also support this project by [**becoming a sponsor on GitHub**](https://github.com/sponsors/crazy-max)
+or by making a [PayPal donation](https://www.paypal.me/crazyws) to ensure this
+journey continues indefinitely!
 
 Thanks again for your support, it is much appreciated! :pray:
 
