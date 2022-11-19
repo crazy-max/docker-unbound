@@ -14,8 +14,7 @@ RUN apk --update --no-cache add binutils clang curl file make pkgconf tar tree x
 FROM base AS base-build
 ENV XX_CC_PREFER_LINKER=ld
 ARG TARGETPLATFORM
-RUN xx-apk --no-cache add gcc g++ expat-dev hiredis-dev libevent-dev libcap libpcap-dev openssl-dev perl
-RUN ln -sf /usr/lib/libhiredis.so /usr/lib/libhiredis.so.1.0.0
+RUN xx-apk --no-cache add gcc g++ expat-dev hiredis hiredis-dev libevent-dev libcap libpcap-dev openssl-dev perl
 RUN xx-clang --setup-target-triple
 
 FROM base AS unbound-src
@@ -104,6 +103,7 @@ RUN apk --update --no-cache add \
     dns-root-hints \
     dnssec-root \
     expat \
+    hiredis \
     libevent \
     libpcap \
     openssl \
