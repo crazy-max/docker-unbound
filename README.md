@@ -12,10 +12,12 @@
 ## About
 
 Docker image for [Unbound](https://unbound.net/), a validating, recursive, and
-caching DNS resolver. If you are interested, [check out](https://hub.docker.com/r/crazymax/)
-my other Docker images!
+caching DNS resolver.
 
-💡 Want to be notified of new releases? Check out 🔔 [Diun (Docker Image Update Notifier)](https://github.com/crazy-max/diun) project!
+> **Note**
+> 
+> Want to be notified of new releases? Check out 🔔 [Diun (Docker Image Update Notifier)](https://github.com/crazy-max/diun)
+> project!
 
 ___
 
