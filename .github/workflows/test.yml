@@ -1,5 +1,9 @@
 name: test
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 on:
   push:
     branches:
@@ -7,15 +11,12 @@ on:
     paths-ignore:
       - '**.md'
   pull_request:
-    branches:
-      - 'master'
     paths-ignore:
       - '**.md'
 
 env:
   BUILD_TAG: unbound:test
   CONTAINER_NAME: unbound
-  RUNNING_LOG_CHECK: "info: start of service"
 
 jobs:
   test:
