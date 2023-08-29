@@ -91,7 +91,7 @@ Image: crazymax/unbound:latest
 ### Docker Compose
 
 Docker compose is the recommended way to run this image. You can use the
-following [docker compose template](examples/compose/docker-compose.yml), then
+following [docker compose template](examples/compose/compose.yml), then
 run the container:
 
 ```shell

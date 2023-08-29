@@ -1,3 +1,5 @@
+name: unbound
+
 services:
   redis:
     image: redis:6-alpine
