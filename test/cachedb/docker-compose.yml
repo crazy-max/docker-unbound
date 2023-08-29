@@ -8,8 +8,8 @@ services:
     restart: always
 
   unbound:
-    image: ${BUILD_TAG:-crazymax/unbound}
-    container_name: unbound
+    image: ${UNBOUND_IMAGE:-crazymax/unbound}
+    container_name: ${UNBOUND_CONTAINER:-unbound}
     depends_on:
       - redis
     ports:

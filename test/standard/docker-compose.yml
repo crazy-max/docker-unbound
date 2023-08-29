@@ -1,7 +1,7 @@
 services:
   unbound:
-    image: ${BUILD_TAG:-crazymax/unbound}
-    container_name: unbound
+    image: ${UNBOUND_IMAGE:-crazymax/unbound}
+    container_name: ${UNBOUND_CONTAINER:-unbound}
     ports:
       - target: 5053
         published: 5053
