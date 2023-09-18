@@ -17,8 +17,8 @@ on:
       - '**.md'
 
 env:
-  DOCKERHUB_SLUG: crazymax/unbound
-  GHCR_SLUG: ghcr.io/crazy-max/unbound
+  DOCKERHUB_SLUG: alauer/unbound
+  GHCR_SLUG: ghcr.io/lauerprojects/unbound
 
 jobs:
   build:
