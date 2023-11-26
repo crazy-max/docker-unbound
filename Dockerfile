@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-ARG UNBOUND_VERSION=1.17.1
+ARG UNBOUND_VERSION=1.19.0
 ARG LDNS_VERSION=1.8.3
 ARG XX_VERSION=1.2.1
 ARG ALPINE_VERSION=3.18
@@ -31,7 +31,6 @@ FROM base-build AS unbound-build
 WORKDIR /src/unbound
 RUN --mount=type=bind,from=unbound-src,source=/src/unbound,target=.,rw <<EOT
   set -ex
-
   CC=xx-clang CXX=xx-clang++ ./configure \
     --host=$(xx-clang --print-target-triple) \
     --prefix=/usr \
@@ -52,7 +51,6 @@ RUN --mount=type=bind,from=unbound-src,source=/src/unbound,target=.,rw <<EOT
     --with-libexpat=$(xx-info sysroot)usr \
     --with-libevent=$(xx-info sysroot)usr \
     --with-ssl=$(xx-info sysroot)usr
-
   make DESTDIR=/out install
   make DESTDIR=/out unbound-event-install
   install -Dm755 contrib/update-anchor.sh /out/usr/share/unbound/update-anchor.sh
@@ -73,7 +71,6 @@ FROM base-build AS ldns-build
 WORKDIR /src/ldns
 RUN --mount=type=bind,from=ldns-src,source=/src/ldns,target=.,rw <<EOT
   set -ex
-
   CC=xx-clang CXX=xx-clang++ CPPFLAGS=-I/src/ldns/ldns ./configure \
     --host=$(xx-clang --print-target-triple) \
     --prefix=/usr \
@@ -87,7 +84,6 @@ RUN --mount=type=bind,from=ldns-src,source=/src/ldns,target=.,rw <<EOT
     --with-drill \
     --with-ssl=$(xx-info sysroot)usr \
     --with-trust-anchor=/var/run/unbound/root.key
-
   make DESTDIR=/out install
   tree /out
   xx-verify /out/usr/bin/drill
