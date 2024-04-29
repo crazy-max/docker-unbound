@@ -14,8 +14,7 @@
 Docker image for [Unbound](https://unbound.net/), a validating, recursive, and
 caching DNS resolver.
 
-> **Note**
-> 
+> [!TIP] 
 > Want to be notified of new releases? Check out 🔔 [Diun (Docker Image Update Notifier)](https://github.com/crazy-max/diun)
 > project!
 
@@ -168,8 +167,7 @@ called for example `/config/00-trust-anchor.conf`:
   auto-trust-anchor-file: "/root.key"
 ```
 
-> **Note**
-> 
+> [!NOTE] 
 > See [documentation](https://nlnetlabs.nl/documentation/unbound/unbound.conf/#auto-trust-anchor-file)
 > for more info about `auto-trust-anchor-file` setting.
 
