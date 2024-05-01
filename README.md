@@ -144,8 +144,7 @@ forward-zone:
 A complete documentation about Ubound configuration can be found on
 NLnet Labs website: https://nlnetlabs.nl/documentation/unbound/unbound.conf/
 
-> **Warning**
-> 
+> [!WARNING]
 > Container has to be restarted to propagate changes
 
 ### Root trust store
