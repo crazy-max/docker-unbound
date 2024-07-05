@@ -42,7 +42,7 @@ jobs:
           labels: |
             org.opencontainers.image.title=Unbound
             org.opencontainers.image.description=A validating, recursive, and caching DNS resolver
-            org.opencontainers.image.vendor=CrazyMax
+            org.opencontainers.image.vendor=lauerprojects
       -
         name: Set up QEMU
         uses: docker/setup-qemu-action@v3
