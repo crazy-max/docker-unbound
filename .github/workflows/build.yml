@@ -82,7 +82,7 @@ jobs:
         name: Check manifest
         if: github.event_name != 'pull_request'
         run: |
-       #   docker buildx imagetools inspect ${{ env.DOCKERHUB_SLUG }}:${{ steps.meta.outputs.version }}
+
           docker buildx imagetools inspect ${{ env.GHCR_SLUG }}:${{ steps.meta.outputs.version }}
       -
         name: Inspect image
