@@ -39,7 +39,6 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: |
-       #     ${{ env.DOCKERHUB_SLUG }}
             ${{ env.GHCR_SLUG }}
           tags: |
             type=match,pattern=(.*)-r,group=1
