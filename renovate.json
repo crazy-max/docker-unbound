@@ -5,5 +5,19 @@
   ],
   "schedule": [
     "* 0-3 * * *"
+  ],
+  {
+  "customDatasources": {
+    "curl": {
+      "defaultRegistryUrlTemplate": "https://nlnetlabs.nl/downloads/unbound/",
+      "format": "html"
+    }
+  },
+  "packageRules": [
+    {
+      "matchDatasources": ["custom.curl"],
+      "extractVersion": "/unbound-(?<version>.+)\\.tar\\.gz$"
+    }
   ]
+}
 }
