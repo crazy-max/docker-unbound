@@ -8,16 +8,18 @@
   ],
 
 
+
   "customDatasources": {
-    "curl": {
+    "unbound": {
       "defaultRegistryUrlTemplate": "https://nlnetlabs.nl/downloads/unbound/",
       "format": "html"
     }
   },
   "packageRules": [
     {
-      "matchDatasources": ["custom.curl"],
-      "extractVersion": "/unbound-(?<version>.+)\\.tar\\.gz$"
+      "matchDatasources": ["custom.unbound"],
+      "extractVersion": "^unbound-(?<version>.+)\\.tar\\.gz$"
     }
   ]
+
 }
