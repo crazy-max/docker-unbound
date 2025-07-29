@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-# renovate: datasource=github-releases depName=NLnetLabs/unbound versioning=loose
+
 ARG UNBOUND_VERSION=1.23.1
 ARG LDNS_VERSION=1.8.4
 ARG XX_VERSION=1.6.1
@@ -20,7 +20,7 @@ RUN xx-clang --setup-target-triple
 FROM base AS unbound-src
 WORKDIR /src/unbound
 ARG UNBOUND_VERSION
-RUN curl -sSL "https://github.com/NLnetLabs/unbound/archive/refs/tags//release-${UNBOUND_VERSION}.tar.gz" | tar xz --strip 1
+RUN curl -sSL "https://unbound.net/downloads/unbound-${UNBOUND_VERSION}.tar.gz" | tar xz --strip 1
 
 FROM base AS ldns-src
 WORKDIR /src/ldns
