@@ -20,7 +20,7 @@ RUN xx-clang --setup-target-triple
 FROM base AS unbound-src
 WORKDIR /src/unbound
 ARG UNBOUND_VERSION
-RUN curl -sSL "https://unbound.net/downloads/unbound-${UNBOUND_VERSION}.tar.gz" | tar xz --strip 1
+RUN curl -sSL "https://github.com/NLnetLabs/unbound/archive/refs/tags//release-${UNBOUND_VERSION}.tar.gz" | tar xz --strip 1
 
 FROM base AS ldns-src
 WORKDIR /src/ldns
