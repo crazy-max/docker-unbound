@@ -5,23 +5,5 @@
   ],
   "schedule": [
     "* 0-3 * * *"
-  ],
-  "regexManagers": [
-    {
-      "fileMatch": ["/Dockerfile$"],
-      "matchStrings": [
-        "ARG UNBOUND_VERSION=[\"']?(?<currentValue>.+?)[\"']?\\s+"
-      ],
-      "datasourceTemplate": "github-releases",
-      "depNameTemplate": "NLnetLabs/unbound",
-    }
-  ],
-  "packageRules": [
-    {
-      "matchDatasources": ["github-releases"],
-      "matchDepNames": ["portainer/portainer"],
-      "matchUpdateTypes": ["minor", "patch"],
-      "automerge": true
-    }
-  ]  
+  ]
 }
