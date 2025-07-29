@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-
+# renovate: datasource=github-releases depName=NLnetLabs/unbound versioning=loose
 ARG UNBOUND_VERSION=1.23.1
 ARG LDNS_VERSION=1.8.4
 ARG XX_VERSION=1.6.1
