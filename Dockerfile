@@ -5,9 +5,9 @@ ARG LDNS_VERSION=1.9.0
 ARG XX_VERSION=1.9.0
 ARG ALPINE_VERSION=3.23
 
-FROM --platform=$BUILDPLATFORM tonistiigi/xx:${XX_VERSION} AS xx
+FROM --platform=$BUILDPLATFORM docker.io/tonistiigi/xx:${XX_VERSION} AS xx
 
-FROM --platform=$BUILDPLATFORM alpine:${ALPINE_VERSION} AS base
+FROM --platform=$BUILDPLATFORM docker.io/alpine:${ALPINE_VERSION} AS base
 COPY --from=xx / /
 RUN apk --update --no-cache add binutils clang curl file make pkgconf tar tree xz
 
@@ -130,6 +130,7 @@ COPY <<-"EOF" /entrypoint.sh
 	unbound-checkconf /etc/unbound/unbound.conf
 	exec unbound -d -c /etc/unbound/unbound.conf
 EOF
+
 CMD ["sh", "/entrypoint.sh"]
 
 HEALTHCHECK --interval=30s --timeout=10s \
