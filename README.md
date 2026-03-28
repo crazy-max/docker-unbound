@@ -124,6 +124,12 @@ is imported.
 If you want to override settings from the main configuration you have to create
 config files (with `.conf` extension) in `/config` folder.
 
+The packaged configuration sets `so-sndbuf: 0` so Unbound uses the kernel
+default socket send buffer size. This avoids the common warning about a
+requested 4194304 byte send buffer not being granted when the container is
+running without elevated kernel socket limits. If you need a larger buffer, set
+`so-sndbuf` explicitly in `/config` and raise the host limit accordingly.
+
 For example, you can set up [forwarding queries](https://nlnetlabs.nl/documentation/unbound/unbound.conf/#forward-host)
 to the appropriate public DNS server for queries that cannot be answered by
 this server using a new configuration named `/config/forward-records.conf`:
