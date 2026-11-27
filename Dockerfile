@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # renovate: datasource=github-releases depName=NLnetLabs/unbound
-ARG UNBOUND_VERSION=1.26.1
+ARG UNBOUND_VERSION=1.26.2
 # renovate: datasource=github-tags depName=NLnetLabs/ldns
 ARG LDNS_VERSION=1.9.2
 # renovate: datasource=docker depName=tonistiigi/xx versioning=docker
