@@ -5,7 +5,7 @@ ARG UNBOUND_VERSION=1.26.1
 # renovate: datasource=github-tags depName=NLnetLabs/ldns
 ARG LDNS_VERSION=1.9.2
 # renovate: datasource=docker depName=tonistiigi/xx versioning=docker
-ARG XX_VERSION=1.9.0
+ARG XX_VERSION=1.10.0
 # renovate: datasource=docker depName=alpine versioning=docker
 ARG ALPINE_VERSION=3.24
 
