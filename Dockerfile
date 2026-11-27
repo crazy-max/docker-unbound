@@ -1,15 +1,19 @@
 # syntax=docker/dockerfile:1
 
+# renovate: datasource=github-releases depName=NLnetLabs/unbound
 ARG UNBOUND_VERSION=1.26.1
+# renovate: datasource=github-tags depName=NLnetLabs/ldns
 ARG LDNS_VERSION=1.9.2
+# renovate: datasource=docker depName=tonistiigi/xx versioning=docker
 ARG XX_VERSION=1.9.0
+# renovate: datasource=docker depName=alpine versioning=docker
 ARG ALPINE_VERSION=3.24
 
 FROM --platform=$BUILDPLATFORM tonistiigi/xx:${XX_VERSION} AS xx
 
 FROM --platform=$BUILDPLATFORM alpine:${ALPINE_VERSION} AS base
 COPY --from=xx / /
-RUN apk --update --no-cache add binutils clang curl file make pkgconf tar tree xz
+RUN apk --update --no-cache add binutils clang file make pkgconf tar tree xz
 
 FROM base AS base-build
 ENV XX_CC_PREFER_LINKER=ld
@@ -20,12 +24,16 @@ RUN xx-clang --setup-target-triple
 FROM base AS unbound-src
 WORKDIR /src/unbound
 ARG UNBOUND_VERSION
-RUN curl -sSL "https://unbound.net/downloads/unbound-${UNBOUND_VERSION}.tar.gz" | tar xz --strip 1
+ADD https://nlnetlabs.nl/downloads/unbound/unbound-${UNBOUND_VERSION}.tar.gz /tmp/unbound.tar.gz
+ADD https://nlnetlabs.nl/downloads/unbound/unbound-${UNBOUND_VERSION}.tar.gz.sha256 /tmp/unbound.sha256
+RUN echo "$(cat /tmp/unbound.sha256)  /tmp/unbound.tar.gz" | sha256sum -c - && tar xzf /tmp/unbound.tar.gz --strip-components=1
 
 FROM base AS ldns-src
 WORKDIR /src/ldns
 ARG LDNS_VERSION
-RUN curl -sSL "https://nlnetlabs.nl/downloads/ldns/ldns-${LDNS_VERSION}.tar.gz" | tar xz --strip 1
+ADD https://nlnetlabs.nl/downloads/ldns/ldns-${LDNS_VERSION}.tar.gz /tmp/ldns.tar.gz
+ADD https://nlnetlabs.nl/downloads/ldns/ldns-${LDNS_VERSION}.tar.gz.sha256 /tmp/ldns.sha256
+RUN echo "$(cat /tmp/ldns.sha256)  /tmp/ldns.tar.gz" | sha256sum -c - && tar xzf /tmp/ldns.tar.gz --strip-components=1
 
 FROM base-build AS unbound-build
 WORKDIR /src/unbound
